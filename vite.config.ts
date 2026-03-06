@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: '/trello-link-holded-power-up/',
+  base: '/',
   build: {
     rollupOptions: {
       input: {

@@ -1,4 +1,4 @@
-const BASE = 'https://miquelferrerllompart.github.io/trello-link-holded-power-up/icons';
+const BASE = 'https://trello-link-holded-power-up.pages.dev/icons';
 
 // Plain SVGs (no fill) — Trello colorizes them automatically
 // Used by card-buttons (only accepts string URL)
