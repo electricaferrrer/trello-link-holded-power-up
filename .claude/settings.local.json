@@ -16,7 +16,10 @@
       "Bash(git push)",
       "Bash(npx wrangler --version)",
       "Bash(npx wrangler deploy)",
-      "Bash(npx wrangler pages deploy dist --project-name trello-link-holded-power-up --commit-dirty=true)"
+      "Bash(npx wrangler pages deploy dist --project-name trello-link-holded-power-up --commit-dirty=true)",
+      "Bash(npm run build)",
+      "Bash(npx wrangler pages deploy dist --project-name trello-link-holded-power-up)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://trello-link-holded-power-up.pages.dev/icons/contact.svg\")"
     ]
   }
 }

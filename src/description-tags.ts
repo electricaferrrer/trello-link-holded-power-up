@@ -6,7 +6,7 @@ const TAG_REGEX: Record<string, RegExp> = {
 export function addTag(desc: string, type: 'contact' | 'project', name: string): string {
   const cleaned = removeTag(desc, type);
   const tag = `{{ ${type}: ${name} }}`;
-  return cleaned ? `${cleaned}\n${tag}` : tag;
+  return cleaned ? `${cleaned}\n\n\n${tag}` : tag;
 }
 
 export function removeTag(desc: string, type: 'contact' | 'project'): string {

@@ -53,7 +53,17 @@ Registered in `src/connector.ts`:
 | `card-buttons` | `src/capabilities/card-buttons.ts` | "Vincular cliente/proyecto" buttons |
 | `card-badges` | `src/capabilities/card-badges.ts` | Shows linked contact/project on card front |
 | `card-back-section` | `src/capabilities/card-back-section.ts` | Iframe section in card detail |
-| `filter-card` | `src/capabilities/card-filter.ts` | Board filter by client/project |
+
+## Description tags (native search)
+
+When linking a contact/project, a tag is appended to the card description:
+- `{{ contact: Name }}` / `{{ project: Name }}`
+- Two blank lines separate existing description from tags
+- On unlink, the tag is removed via regex
+- Uses Trello REST API (OAuth) to PUT the updated description
+- Key files: `src/description-tags.ts` (tag manipulation), `src/trello-api.ts` (API + OAuth)
+- `public/card-back.html` has inline versions of the same logic (no module imports due to CSP)
+- `appKey` must be passed to both `TrelloPowerUp.initialize()` and `TrelloPowerUp.iframe()` for REST API to work
 
 ## Data storage
 
@@ -83,3 +93,6 @@ All contacts/projects are loaded once and filtered client-side.
 - **Button icons not showing** → `card-buttons` only accepts string URL for `icon`
 - **Worker returns "secret not configured"** → redeploy worker after setting secret: `cd worker && npx wrangler deploy`
 - **HTML response from Holded** → invalid API key; worker detects this and returns 401 JSON
+- **"Invalid return_url"** on OAuth → allowed origins in Trello Power-Up admin must include `https://trello-link-holded-power-up.pages.dev`
+- **Description tags not written** → `appKey` must be in `TrelloPowerUp.iframe()` call, not just `initialize()`
+- **Card-back not refreshing** → use `t.render(function() { render(); })` to register a re-render callback

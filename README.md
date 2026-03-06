@@ -40,9 +40,16 @@ Al abrir una tarjeta se muestra una sección "Holded" con tags de color:
 
 En la vista de tablero, las tarjetas muestran badges con icono + nombre del cliente/proyecto vinculado.
 
-### Filtro de tablero
+### Tags en descripción (búsqueda nativa)
 
-Desde el menú de filtros nativo de Trello se puede filtrar por cliente y/o proyecto de Holded.
+Al vincular un cliente o proyecto, se añade automáticamente un tag al final de la descripción de la tarjeta:
+
+```
+{{ contact: Nombre del cliente }}
+{{ project: Nombre del proyecto }}
+```
+
+Esto permite usar la **búsqueda nativa de Trello** para encontrar tarjetas por cliente o proyecto. Al desvincular, el tag se elimina automáticamente de la descripción.
 
 ## Requisitos previos
 
@@ -78,18 +85,17 @@ trello-link-holded-power-up/
 │   ├── storage.ts                # Helpers para Trello card storage
 │   ├── types.ts                  # Interfaces TypeScript
 │   ├── icons.ts                  # URLs de iconos centralizadas
+│   ├── description-tags.ts       # Helpers para tags {{ contact/project: ... }} en descripción
+│   ├── trello-api.ts             # OAuth + PUT descripción vía Trello REST API
 │   ├── capabilities/
 │   │   ├── card-buttons.ts       # Botones "Vincular cliente/proyecto"
 │   │   ├── card-badges.ts        # Badges en vista de tablero
-│   │   ├── card-back-section.ts  # Sección iframe en detalle de tarjeta
-│   │   └── card-filter.ts        # Filtro de tablero por cliente/proyecto
+│   │   └── card-back-section.ts  # Sección iframe en detalle de tarjeta
 │   └── popups/
 │       ├── search-contact.html   # Popup búsqueda de clientes
 │       ├── search-contact.ts
 │       ├── search-project.html   # Popup búsqueda de proyectos
-│       ├── search-project.ts
-│       ├── filter.html           # Popup filtro de tablero
-│       └── filter.ts
+│       └── search-project.ts
 ├── public/
 │   ├── card-back.html            # Iframe del card-back (inline JS por CSP)
 │   └── icons/                    # SVGs para iconos
@@ -141,7 +147,8 @@ El frontend queda en `https://trello-link-holded-power-up.pages.dev`.
 1. Ir a [trello.com/power-ups/admin](https://trello.com/power-ups/admin)
 2. Crear nuevo Power-Up
 3. URL del iframe connector: `https://trello-link-holded-power-up.pages.dev/`
-4. Capabilities a activar: `card-buttons`, `card-badges`, `card-back-section`, `filter-card`
+4. Capabilities a activar: `card-buttons`, `card-badges`, `card-back-section`
+5. Allowed origins: `https://trello-link-holded-power-up.pages.dev` (necesario para OAuth)
 
 ## Stack técnico
 
@@ -174,6 +181,8 @@ interface CardHoldedData {
 ```
 
 Almacenado con `t.set('card', 'shared', 'holdedData', data)` (max ~4KB, más que suficiente).
+
+Además, los tags `{{ contact: ... }}` y `{{ project: ... }}` se escriben en la descripción de la tarjeta vía Trello REST API (OAuth) para permitir búsqueda nativa.
 
 ## Seguridad
 
