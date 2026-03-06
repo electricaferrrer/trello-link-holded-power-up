@@ -1,138 +1,186 @@
 # Trello Link Holded Power-Up
 
-Power-Up de Trello para vincular tarjetas con clientes y proyectos de Holded. Frontend puro, sin backend.
-
-## Objetivo
-
-Permitir al equipo de Eléctrica Ferrer asociar tarjetas de Trello a **clientes** y **proyectos** de Holded, de forma que al abrir una tarjeta se vea rápidamente a qué cliente/proyecto pertenece.
+Power-Up de Trello para vincular tarjetas con clientes y proyectos de [Holded](https://www.holded.com/).
 
 ## Arquitectura
 
-- **Frontend puro** — HTML + TypeScript (Vite)
-- **Sin backend** — las llamadas a la API de Holded se hacen directamente desde el Power-Up
-- **Hosting** — GitHub Pages (gratis, HTTPS automático)
-- **Almacenamiento** — Trello Power-Up storage (`t.set('card', 'shared', ...)`)
+```
+┌─────────────────────┐       ┌──────────────────────────┐       ┌─────────────────┐
+│   Trello (browser)  │──────▶│   Cloudflare Pages       │       │  Holded API     │
+│                     │       │   Frontend (Vite + TS)   │       │                 │
+└─────────────────────┘       └──────────────────────────┘       └────────▲────────┘
+                                        │                                 │
+                                        │ fetch                           │ key: SECRET
+                                        ▼                                 │
+                              ┌──────────────────────────┐                │
+                              │   Cloudflare Worker      │────────────────┘
+                              │   holded-proxy           │
+                              │   (API key como secret)  │
+                              └──────────────────────────┘
+```
+
+- **Frontend** — Vite + TypeScript, sin framework. Hosted en Cloudflare Pages.
+- **Worker** — Proxy en Cloudflare Workers que inyecta el API key de Holded. El frontend nunca toca la API key.
+- **Storage** — Trello Power-Up storage (`t.set('card', 'shared', ...)`) para guardar los datos por tarjeta.
 
 ## Funcionalidades
 
-### 1. Vincular cliente a tarjeta
+### Vincular cliente/proyecto
 
-- Botón en la tarjeta: "Vincular cliente"
-- Se abre popup con campo de búsqueda
-- Búsqueda contra `GET https://api.holded.com/api/invoicing/v1/contacts?search=...`
-- El usuario selecciona un cliente de la lista
-- Se guarda en la tarjeta: `{ holdedContactId, holdedContactName }`
-- Se muestra en el card-back-section y como badge
+Botones en cada tarjeta para buscar y vincular un cliente o proyecto de Holded. La búsqueda es flexible: divide las palabras del query y busca en nombre, email, CIF/NIF, nombre comercial.
 
-### 2. Vincular proyecto a tarjeta
+### Card-back section
 
-- Botón en la tarjeta: "Vincular proyecto"
-- Se abre popup con lista de proyectos (con búsqueda/filtro)
-- Datos de `GET https://api.holded.com/api/invoicing/v1/projects`
-- El usuario selecciona un proyecto
-- Se guarda en la tarjeta: `{ holdedProjectId, holdedProjectName }`
-- Se muestra en el card-back-section y como badge
+Al abrir una tarjeta se muestra una sección "Holded" con tags de color:
+- **Azul** — cliente vinculado (click abre en Holded)
+- **Verde** — proyecto vinculado (click abre en Holded)
+- Hover muestra botón para desvincular (con confirmación)
 
-### 3. Card-back-section
+### Badges
 
-Sección visible al abrir la tarjeta que muestra:
-- Cliente vinculado (nombre, con opción de desvincular)
-- Proyecto vinculado (nombre, con opción de desvincular)
-- Links directos a Holded (si la URL es predecible)
+En la vista de tablero, las tarjetas muestran badges con icono + nombre del cliente/proyecto vinculado.
 
-### 4. Badges
+### Filtro de tablero
 
-Badges visibles en la vista de tablero:
-- Badge con icono de persona + nombre del cliente
-- Badge con icono de carpeta + nombre del proyecto
+Desde el menú de filtros nativo de Trello se puede filtrar por cliente y/o proyecto de Holded.
 
-## Configuración del API Key
+## Requisitos previos
 
-- El API key de Holded se configura a nivel de **board** (`t.set('board', 'shared', { holdedApiKey })`)
-- Un **board button** "Configurar Holded" permite introducir/actualizar el API key
-- Solo necesita configurarse una vez por tablero
+- [Node.js](https://nodejs.org/) >= 18
+- Cuenta de [Cloudflare](https://www.cloudflare.com/) (gratuita)
+- API key de [Holded](https://app.holded.com/api)
+- Acceso a un tablero de Trello para crear el Power-Up
 
-## Stack técnico
+## Instalación
 
-- **Vite** — bundler
-- **TypeScript** — tipado
-- **Vanilla JS/HTML** — sin framework (el Power-Up es ligero)
-- **Trello Power-Up SDK** — `https://p.trellocdn.com/power-up.min.js`
+```bash
+git clone https://github.com/miquelferrerllompart/trello-link-holded-power-up.git
+cd trello-link-holded-power-up
+npm install
+```
 
-## Estructura de archivos
+## Desarrollo local
+
+```bash
+npm run dev
+```
+
+Abre `http://localhost:5173` — aunque para probar el Power-Up necesitas registrarlo en Trello apuntando a esa URL (o usar un túnel como ngrok).
+
+## Estructura del proyecto
 
 ```
 trello-link-holded-power-up/
-├── index.html              # Entry point del Power-Up (registro de capabilities)
+├── index.html                    # Entry point del Power-Up
 ├── src/
-│   ├── connector.ts        # Inicialización del Power-Up (TrelloPowerUp.initialize)
-│   ├── holded-api.ts       # Cliente HTTP para la API de Holded
-│   ├── storage.ts          # Helpers para leer/escribir en Trello storage
-│   ├── types.ts            # Tipos TypeScript (Contact, Project, StoredData)
+│   ├── connector.ts              # Registro de capabilities (TrelloPowerUp.initialize)
+│   ├── holded-api.ts             # Cliente HTTP → proxy worker
+│   ├── storage.ts                # Helpers para Trello card storage
+│   ├── types.ts                  # Interfaces TypeScript
+│   ├── icons.ts                  # URLs de iconos centralizadas
 │   ├── capabilities/
-│   │   ├── card-buttons.ts     # Botones "Vincular cliente/proyecto"
-│   │   ├── card-back-section.ts # Sección en el detalle de la tarjeta
-│   │   ├── card-badges.ts      # Badges en vista de tablero
-│   │   └── board-buttons.ts    # Botón "Configurar Holded"
+│   │   ├── card-buttons.ts       # Botones "Vincular cliente/proyecto"
+│   │   ├── card-badges.ts        # Badges en vista de tablero
+│   │   ├── card-back-section.ts  # Sección iframe en detalle de tarjeta
+│   │   └── card-filter.ts        # Filtro de tablero por cliente/proyecto
 │   └── popups/
-│       ├── search-contact.html # Popup de búsqueda de clientes
+│       ├── search-contact.html   # Popup búsqueda de clientes
 │       ├── search-contact.ts
-│       ├── search-project.html # Popup de búsqueda de proyectos
+│       ├── search-project.html   # Popup búsqueda de proyectos
 │       ├── search-project.ts
-│       └── settings.html       # Popup de configuración (API key)
-│       └── settings.ts
+│       ├── filter.html           # Popup filtro de tablero
+│       └── filter.ts
 ├── public/
-│   ├── icon.svg            # Icono del Power-Up
-│   └── manifest.json       # Manifest del Power-Up (opcional)
-├── package.json
-├── tsconfig.json
+│   ├── card-back.html            # Iframe del card-back (inline JS por CSP)
+│   └── icons/                    # SVGs para iconos
+│       ├── contact.svg           # Sin fill (Trello coloriza)
+│       ├── contact-light.svg
+│       ├── contact-dark.svg
+│       ├── project.svg
+│       ├── project-light.svg
+│       ├── project-dark.svg
+│       └── holded-light.svg
+├── worker/
+│   ├── index.ts                  # Cloudflare Worker (proxy API)
+│   └── wrangler.toml             # Config del worker
 ├── vite.config.ts
-└── README.md
+├── tsconfig.json
+├── package.json
+└── CLAUDE.md                     # Guía para asistentes AI
 ```
-
-## API de Holded — Endpoints necesarios
-
-| Endpoint | Método | Uso |
-|---|---|---|
-| `/api/invoicing/v1/contacts` | GET | Listar/buscar clientes |
-| `/api/invoicing/v1/contacts/:id` | GET | Obtener detalle de un cliente |
-| `/api/invoicing/v1/projects` | GET | Listar proyectos |
-
-Headers requeridos: `key: {HOLDED_API_KEY}`
-
-## Datos almacenados en cada tarjeta
-
-```typescript
-interface CardHoldedData {
-  contactId?: string;
-  contactName?: string;
-  projectId?: string;
-  projectName?: string;
-}
-```
-
-Se almacena con `t.set('card', 'shared', 'holdedData', data)` (máx ~4KB por card, más que suficiente).
 
 ## Deploy
 
-1. `npm run build` — genera `dist/`
-2. Deploy `dist/` a GitHub Pages (o cualquier hosting estático con HTTPS)
-3. En Trello: crear Power-Up custom apuntando a la URL del hosting
+### 1. Configurar el API key de Holded en el Worker
+
+```bash
+echo "TU_API_KEY_DE_HOLDED" | npx wrangler secret put HOLDED_API_KEY --name holded-proxy
+```
+
+### 2. Desplegar el Worker
+
+```bash
+cd worker
+npx wrangler deploy
+cd ..
+```
+
+El worker queda en `https://holded-proxy.mferrer.workers.dev`.
+
+### 3. Build y deploy del frontend
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name trello-link-holded-power-up
+```
+
+El frontend queda en `https://trello-link-holded-power-up.pages.dev`.
+
+### 4. Registrar el Power-Up en Trello
+
+1. Ir a [trello.com/power-ups/admin](https://trello.com/power-ups/admin)
+2. Crear nuevo Power-Up
+3. URL del iframe connector: `https://trello-link-holded-power-up.pages.dev/`
+4. Capabilities a activar: `card-buttons`, `card-badges`, `card-back-section`, `filter-card`
+
+## Stack técnico
+
+| Componente | Tecnología |
+|---|---|
+| Frontend | Vite + TypeScript (vanilla, sin framework) |
+| Hosting frontend | Cloudflare Pages |
+| Proxy API | Cloudflare Workers |
+| SDK | [Trello Power-Up SDK](https://developer.atlassian.com/cloud/trello/power-ups/) |
+| API | [Holded API v1](https://developers.holded.com/) |
+
+## API de Holded (endpoints utilizados)
+
+| Endpoint | Uso |
+|---|---|
+| `GET /api/invoicing/v1/contacts` | Listar contactos (clientes/proveedores) |
+| `GET /api/projects/v1/projects` | Listar proyectos |
+
+Todos los contactos/proyectos se cargan una vez y se filtran en el cliente.
+
+## Datos almacenados por tarjeta
+
+```typescript
+interface CardHoldedData {
+  contactId?: string;    // ID del contacto en Holded
+  contactName?: string;  // Nombre del contacto
+  projectId?: string;    // ID del proyecto en Holded
+  projectName?: string;  // Nombre del proyecto
+}
+```
+
+Almacenado con `t.set('card', 'shared', 'holdedData', data)` (max ~4KB, más que suficiente).
 
 ## Seguridad
 
-- El API key de Holded queda en el storage del board (visible para miembros del board)
-- Aceptable para uso interno del equipo
-- Si se necesita más seguridad en el futuro: añadir un proxy backend (Cloudflare Worker / GAS)
+- El API key de Holded se almacena como **secret** en Cloudflare Workers (nunca expuesto al frontend)
+- El Worker es un proxy de solo lectura (GET) — no puede modificar datos en Holded
+- CORS configurado con `Access-Control-Allow-Origin: *` (necesario para que Trello pueda llamar al worker)
 
-## Pasos de implementación
+## Licencia
 
-1. **Scaffold** — Inicializar proyecto con Vite + TS
-2. **Connector** — Registro del Power-Up con capabilities básicas
-3. **Settings** — Board button para configurar API key
-4. **Holded API client** — Módulo para llamar a la API de Holded
-5. **Búsqueda de clientes** — Popup + vinculación a tarjeta
-6. **Búsqueda de proyectos** — Popup + vinculación a tarjeta
-7. **Card-back-section** — Mostrar datos vinculados
-8. **Badges** — Mostrar cliente/proyecto en vista de tablero
-9. **Deploy** — Configurar GitHub Pages + registrar Power-Up en Trello
+Proyecto privado de uso interno.
