@@ -22,7 +22,7 @@ export interface CardHoldedData {
 }
 
 export interface TrelloPowerUp {
-  initialize(capabilities: Record<string, unknown>): void;
+  initialize(capabilities: Record<string, unknown>, options?: { appKey?: string; appName?: string }): void;
   iframe(): TrelloContext;
 }
 

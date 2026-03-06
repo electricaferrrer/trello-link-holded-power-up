@@ -3,8 +3,14 @@ import { getCardButtons } from './capabilities/card-buttons';
 import { getCardBackSection } from './capabilities/card-back-section';
 import { HOLDED_ICON_URL } from './icons';
 
-window.TrelloPowerUp.initialize({
-  'card-buttons': (t: unknown) => getCardButtons(t),
-  'card-badges': (t: unknown) => getCardBadges(t),
-  'card-back-section': (t: unknown) => getCardBackSection(t, HOLDED_ICON_URL),
-});
+window.TrelloPowerUp.initialize(
+  {
+    'card-buttons': (t: unknown) => getCardButtons(t),
+    'card-badges': (t: unknown) => getCardBadges(t),
+    'card-back-section': (t: unknown) => getCardBackSection(t, HOLDED_ICON_URL),
+  },
+  {
+    appKey: '81d86f6c21c827e54947d36746561233',
+    appName: 'Holded',
+  }
+);
