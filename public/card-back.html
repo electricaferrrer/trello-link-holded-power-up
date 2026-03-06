@@ -142,7 +142,7 @@
     }
 
     var contentDiv = document.getElementById('content');
-    var t = window.TrelloPowerUp.iframe();
+    var t = window.TrelloPowerUp.iframe({ appKey: '81d86f6c21c827e54947d36746561233', appName: 'Holded' });
 
     function render() {
       t.get('card', 'shared', 'holdedData')
