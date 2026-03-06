@@ -18,8 +18,11 @@ async function loadProjects(): Promise<HoldedProject[]> {
 
 function filterProjects(projects: HoldedProject[], query: string): HoldedProject[] {
   if (!query) return projects;
-  const q = query.toLowerCase();
-  return projects.filter((p) => p.name.toLowerCase().includes(q));
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return projects.filter((p) => {
+    const text = [p.name, p.status].filter(Boolean).join(' ').toLowerCase();
+    return words.every((w) => text.includes(w));
+  });
 }
 
 function renderResults(projects: HoldedProject[]) {

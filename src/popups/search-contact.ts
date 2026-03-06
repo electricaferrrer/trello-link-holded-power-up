@@ -18,15 +18,14 @@ async function loadContacts(): Promise<HoldedContact[]> {
 
 function filterContacts(contacts: HoldedContact[], query: string): HoldedContact[] {
   if (!query) return contacts;
-  const q = query.toLowerCase();
-  return contacts.filter(
-    (c) =>
-      c.name.toLowerCase().includes(q) ||
-      (c.email && c.email.toLowerCase().includes(q)) ||
-      (c.code && c.code.toLowerCase().includes(q)) ||
-      (c.tradeName && c.tradeName.toLowerCase().includes(q)) ||
-      (c.vatnumber && c.vatnumber.toLowerCase().includes(q))
-  );
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return contacts.filter((c) => {
+    const text = [c.name, c.email, c.code, c.tradeName, c.vatnumber]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return words.every((w) => text.includes(w));
+  });
 }
 
 function renderResults(contacts: HoldedContact[]) {
