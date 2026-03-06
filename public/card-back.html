@@ -8,31 +8,98 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
-      padding: 8px;
-      font-size: 14px;
+      padding: 0;
       background: transparent;
       color: #172b4d;
     }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+      color: #44546f;
+      margin-bottom: 6px;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      position: relative;
+      max-width: 100%;
+      line-height: 20px;
+      transition: padding-right 0.15s;
+    }
+    .tag-contact {
+      background: #e4f0f6;
+      color: #0c66a1;
+    }
+    .tag-project {
+      background: #e6f4ea;
+      color: #1b7742;
+    }
+    .tag-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .tag-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tag-close {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .tag:hover .tag-close {
+      display: inline-flex;
+    }
+    .tag:hover {
+      padding-right: 4px;
+    }
+    .tag-close-icon {
+      width: 10px;
+      height: 10px;
+    }
+    .empty {
+      color: #6b778c;
+      font-size: 13px;
+      padding: 4px 0;
+    }
+
+    /* Dark mode */
     @media (prefers-color-scheme: dark) {
       body { color: #b6c2cf; }
-      .label { color: #9fadbc; }
-      .value { color: #b6c2cf; }
-      .icon-light { display: none; }
-      .icon-dark { display: inline-block; }
+      .section-label { color: #a9abaf; }
+      .tag-contact {
+        background: rgba(0, 121, 191, 0.2);
+        color: #579dff;
+      }
+      .tag-project {
+        background: rgba(27, 119, 66, 0.2);
+        color: #4bce97;
+      }
+      .tag-contact .tag-icon { fill: #579dff; }
+      .tag-project .tag-icon { fill: #4bce97; }
+      .tag-close-icon { fill: currentColor; }
+      .empty { color: #8c9bab; }
     }
-    .row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
-    .row-left { display: flex; align-items: center; gap: 8px; }
-    .row-icon { width: 16px; height: 16px; flex-shrink: 0; }
-    .label { color: #6b778c; font-size: 12px; }
-    .value { font-weight: 500; display: block; }
-    .link { color: #0079bf; text-decoration: none; }
-    .link:hover { text-decoration: underline; }
-    .unlink { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #de350b; cursor: pointer; margin-left: 8px; white-space: nowrap; background: none; border: none; padding: 0; font-family: inherit; }
-    .unlink:hover { text-decoration: underline; }
-    .unlink-icon { width: 12px; height: 12px; }
-    .empty { color: #6b778c; text-align: center; padding: 12px; }
-    .icon-dark { display: none; }
-    .icon-light { display: inline-block; }
   </style>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
@@ -42,13 +109,11 @@
     var HOLDED_CONTACT_URL = 'https://app.holded.com/contacts/';
     var HOLDED_PROJECT_URL = 'https://app.holded.com/projects/p/';
 
-    var CONTACT_SVG_LIGHT = '<svg class="row-icon icon-light" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#42526e"><path d="M384 48c8.8 0 16 7.2 16 16l0 384c0 8.8-7.2 16-16 16L96 464c-8.8 0-16-7.2-16-16L80 64c0-8.8 7.2-16 16-16l288 0zM96 0C60.7 0 32 28.7 32 64l0 384c0 35.3 28.7 64 64 64l288 0c35.3 0 64-28.7 64-64l0-384c0-35.3-28.7-64-64-64L96 0zM240 248a56 56 0 1 0 0-112 56 56 0 1 0 0 112zm-32 40c-44.2 0-80 35.8-80 80 0 8.8 7.2 16 16 16l192 0c8.8 0 16-7.2 16-16 0-44.2-35.8-80-80-80l-64 0zM512 80c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64zM496 192c-8.8 0-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64c0-8.8-7.2-16-16-16zm16 144c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64z"/></svg>';
-    var CONTACT_SVG_DARK = '<svg class="row-icon icon-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#ffffff"><path d="M384 48c8.8 0 16 7.2 16 16l0 384c0 8.8-7.2 16-16 16L96 464c-8.8 0-16-7.2-16-16L80 64c0-8.8 7.2-16 16-16l288 0zM96 0C60.7 0 32 28.7 32 64l0 384c0 35.3 28.7 64 64 64l288 0c35.3 0 64-28.7 64-64l0-384c0-35.3-28.7-64-64-64L96 0zM240 248a56 56 0 1 0 0-112 56 56 0 1 0 0 112zm-32 40c-44.2 0-80 35.8-80 80 0 8.8 7.2 16 16 16l192 0c8.8 0 16-7.2 16-16 0-44.2-35.8-80-80-80l-64 0zM512 80c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64zM496 192c-8.8 0-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64c0-8.8-7.2-16-16-16zm16 144c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64z"/></svg>';
+    var CONTACT_SVG = '<svg class="tag-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M384 48c8.8 0 16 7.2 16 16l0 384c0 8.8-7.2 16-16 16L96 464c-8.8 0-16-7.2-16-16L80 64c0-8.8 7.2-16 16-16l288 0zM96 0C60.7 0 32 28.7 32 64l0 384c0 35.3 28.7 64 64 64l288 0c35.3 0 64-28.7 64-64l0-384c0-35.3-28.7-64-64-64L96 0zM240 248a56 56 0 1 0 0-112 56 56 0 1 0 0 112zm-32 40c-44.2 0-80 35.8-80 80 0 8.8 7.2 16 16 16l192 0c8.8 0 16-7.2 16-16 0-44.2-35.8-80-80-80l-64 0zM512 80c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64zM496 192c-8.8 0-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64c0-8.8-7.2-16-16-16zm16 144c0-8.8-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8 7.2 16 16 16s16-7.2 16-16l0-64z"/></svg>';
 
-    var PROJECT_SVG_LIGHT = '<svg class="row-icon icon-light" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="#42526e"><path d="M384 80c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16L64 176c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96l0 64c0 35.3 28.7 64 64 64l8 0 0 96c0 48.6 39.4 88 88 88l32 0 0 8c0 35.3 28.7 64 64 64l128 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64l-128 0c-35.3 0-64 28.7-64 64l0 8-32 0c-22.1 0-40-17.9-40-40l0-96 264 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 32zM384 336c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16l128 0z"/></svg>';
-    var PROJECT_SVG_DARK = '<svg class="row-icon icon-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="#ffffff"><path d="M384 80c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16L64 176c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96l0 64c0 35.3 28.7 64 64 64l8 0 0 96c0 48.6 39.4 88 88 88l32 0 0 8c0 35.3 28.7 64 64 64l128 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64l-128 0c-35.3 0-64 28.7-64 64l0 8-32 0c-22.1 0-40-17.9-40-40l0-96 264 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 32zM384 336c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16l128 0z"/></svg>';
+    var PROJECT_SVG = '<svg class="tag-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M384 80c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16L64 176c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96l0 64c0 35.3 28.7 64 64 64l8 0 0 96c0 48.6 39.4 88 88 88l32 0 0 8c0 35.3 28.7 64 64 64l128 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64l-128 0c-35.3 0-64 28.7-64 64l0 8-32 0c-22.1 0-40-17.9-40-40l0-96 264 0c35.3 0 64-28.7 64-64l0-64c0-35.3-28.7-64-64-64L64 32zM384 336c8.8 0 16 7.2 16 16l0 64c0 8.8-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16l128 0z"/></svg>';
 
-    var UNLINK_SVG_LIGHT = '<svg class="unlink-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="#de350b"><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L489.3 358.2l90.5-90.5c56.5-56.5 56.5-148 0-204.5c-56.5-56.5-148-56.5-204.5 0L294.3 144.3l-64-50.2 95.5-95.5c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8l-95.5 95.5-64-50.2 90.5-90.5c56.5-56.5 56.5-148 0-204.5zM116.7 467.5l-90.5 90.5c-56.5 56.5-56.5 148 0 204.5s148 56.5 204.5 0l95.5-95.5 64 50.2-95.5 95.5c-87.5 87.5-229.3 87.5-316.8 0s-87.5-229.3 0-316.8l95.5-95.5 64 50.2z"/></svg>';
+    var CLOSE_SVG = '<svg class="tag-close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>';
 
     var contentDiv = document.getElementById('content');
     var t = window.TrelloPowerUp.iframe();
@@ -57,45 +122,43 @@
       t.get('card', 'shared', 'holdedData')
         .then(function(data) {
           data = data || {};
-          var rows = [];
+          var tags = [];
 
           if (data.contactName) {
-            var contactLink = data.contactId
-              ? '<a class="value link" href="' + HOLDED_CONTACT_URL + data.contactId + '" target="_blank">' + data.contactName + '</a>'
-              : '<div class="value">' + data.contactName + '</div>';
-            rows.push(
-              '<div class="row">' +
-                '<div class="row-left">' + CONTACT_SVG_LIGHT + CONTACT_SVG_DARK +
-                  '<div><div class="label">Cliente</div>' + contactLink + '</div>' +
-                '</div>' +
-                '<button class="unlink" data-field="contact">Desvincular</button>' +
-              '</div>'
+            var href = data.contactId ? HOLDED_CONTACT_URL + data.contactId : '#';
+            var target = data.contactId ? ' target="_blank"' : '';
+            tags.push(
+              '<a class="tag tag-contact" href="' + href + '"' + target + '>' +
+                CONTACT_SVG +
+                '<span class="tag-name">' + data.contactName + '</span>' +
+                '<span class="tag-close" data-field="contact">' + CLOSE_SVG + '</span>' +
+              '</a>'
             );
           }
 
           if (data.projectName) {
-            var projectLink = data.projectId
-              ? '<a class="value link" href="' + HOLDED_PROJECT_URL + data.projectId + '" target="_blank">' + data.projectName + '</a>'
-              : '<div class="value">' + data.projectName + '</div>';
-            rows.push(
-              '<div class="row">' +
-                '<div class="row-left">' + PROJECT_SVG_LIGHT + PROJECT_SVG_DARK +
-                  '<div><div class="label">Proyecto</div>' + projectLink + '</div>' +
-                '</div>' +
-                '<button class="unlink" data-field="project">Desvincular</button>' +
-              '</div>'
+            var href = data.projectId ? HOLDED_PROJECT_URL + data.projectId : '#';
+            var target = data.projectId ? ' target="_blank"' : '';
+            tags.push(
+              '<a class="tag tag-project" href="' + href + '"' + target + '>' +
+                PROJECT_SVG +
+                '<span class="tag-name">' + data.projectName + '</span>' +
+                '<span class="tag-close" data-field="project">' + CLOSE_SVG + '</span>' +
+              '</a>'
             );
           }
 
-          if (rows.length === 0) {
-            contentDiv.innerHTML = '<div class="empty">No hay datos vinculados de Holded.</div>';
+          if (tags.length === 0) {
+            contentDiv.innerHTML = '<div class="empty">No hay datos vinculados.</div>';
           } else {
-            contentDiv.innerHTML = rows.join('');
+            contentDiv.innerHTML = '<div class="tags">' + tags.join('') + '</div>';
           }
 
-          var unlinkBtns = contentDiv.querySelectorAll('.unlink');
-          for (var i = 0; i < unlinkBtns.length; i++) {
-            unlinkBtns[i].addEventListener('click', function() {
+          var closeBtns = contentDiv.querySelectorAll('.tag-close');
+          for (var i = 0; i < closeBtns.length; i++) {
+            closeBtns[i].addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
               var field = this.getAttribute('data-field');
               t.get('card', 'shared', 'holdedData').then(function(current) {
                 current = current || {};
