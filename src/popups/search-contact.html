@@ -5,15 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscar cliente</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 8px; }
-    .search-box { width: 100%; padding: 8px; border: 1px solid #dfe1e6; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
-    .results { margin-top: 8px; max-height: 300px; overflow-y: auto; }
-    .result-item { padding: 8px; border-bottom: 1px solid #f0f0f0; cursor: pointer; border-radius: 4px; }
-    .result-item:hover { background: #e4f0f6; }
-    .result-name { font-weight: 500; }
-    .result-email { font-size: 12px; color: #6b778c; }
-    .loading, .error, .empty { padding: 16px; text-align: center; color: #6b778c; font-size: 14px; }
-    .error { color: #de350b; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 8px;
+      background: transparent;
+      color: #172b4d;
+    }
+    .search-box {
+      width: 100%;
+      padding: 8px 10px;
+      border: none;
+      border-radius: 3px;
+      font-size: 14px;
+      box-sizing: border-box;
+      background: #091e420f;
+      color: inherit;
+      outline: none;
+      transition: background 0.2s;
+    }
+    .search-box:focus {
+      background: #fff;
+      box-shadow: inset 0 0 0 2px #0079bf;
+    }
+    .search-box::placeholder { color: #626f86; }
+    .results {
+      margin-top: 4px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .result-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.1s;
+    }
+    .result-item:hover { background: #091e420f; }
+    .result-item:active { background: #091e4224; }
+    .result-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #0079bf;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .result-info { min-width: 0; }
+    .result-name {
+      font-size: 14px;
+      font-weight: 400;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .result-email {
+      font-size: 12px;
+      color: #626f86;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .loading, .error, .empty {
+      padding: 16px;
+      text-align: center;
+      color: #626f86;
+      font-size: 14px;
+    }
+    .error { color: #ae2e24; }
+
+    @media (prefers-color-scheme: dark) {
+      body { color: #b6c2cf; }
+      .search-box {
+        background: #22272b;
+        color: #b6c2cf;
+      }
+      .search-box:focus {
+        background: #22272b;
+        box-shadow: inset 0 0 0 2px #579dff;
+      }
+      .search-box::placeholder { color: #8c9bab; }
+      .result-item:hover { background: #a6c5e229; }
+      .result-item:active { background: #a6c5e238; }
+      .result-email { color: #8c9bab; }
+      .loading, .empty { color: #8c9bab; }
+      .error { color: #f87168; }
+    }
   </style>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>

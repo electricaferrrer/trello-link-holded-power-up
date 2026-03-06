@@ -40,12 +40,17 @@ function renderResults(contacts: HoldedContact[]) {
   }
   resultsDiv.innerHTML = contacts
     .map(
-      (c) => `
+      (c) => {
+        const initials = c.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        return `
     <div class="result-item" data-id="${c.id}" data-name="${c.name}">
-      <div class="result-name">${c.name}</div>
-      ${c.email ? `<div class="result-email">${c.email}</div>` : ''}
-    </div>
-  `
+      <div class="result-avatar">${initials}</div>
+      <div class="result-info">
+        <div class="result-name">${c.name}</div>
+        ${c.email ? `<div class="result-email">${c.email}</div>` : ''}
+      </div>
+    </div>`;
+      }
     )
     .join('');
 

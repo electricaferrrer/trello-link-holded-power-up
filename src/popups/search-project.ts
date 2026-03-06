@@ -34,12 +34,17 @@ function renderResults(projects: HoldedProject[]) {
   }
   resultsDiv.innerHTML = projects
     .map(
-      (p) => `
+      (p) => {
+        const initials = p.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        return `
     <div class="result-item" data-id="${p.id}" data-name="${p.name}">
-      <div class="result-name">${p.name}</div>
-      ${p.status ? `<div class="result-status">${p.status}</div>` : ''}
-    </div>
-  `
+      <div class="result-avatar">${initials}</div>
+      <div class="result-info">
+        <div class="result-name">${p.name}</div>
+        ${p.status ? `<div class="result-status">${p.status}</div>` : ''}
+      </div>
+    </div>`;
+      }
     )
     .join('');
 
