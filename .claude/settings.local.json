@@ -6,7 +6,14 @@
       "Bash(npx vite build)",
       "Bash(git init)",
       "Bash(git add -A)",
-      "Bash(git commit -m \"Initial scaffold: Trello Link Holded Power-Up:*)"
+      "Bash(git commit -m \"Initial scaffold: Trello Link Holded Power-Up:*)",
+      "Bash(gh repo create electricaferrer/trello-link-holded-power-up --public --source=. --push --description \"Power-Up de Trello para vincular tarjetas con clientes y proyectos de Holded\")",
+      "Bash(gh auth status)",
+      "Bash(gh repo create trello-link-holded-power-up --public --source=. --push --description \"Power-Up de Trello para vincular tarjetas con clientes y proyectos de Holded\")",
+      "Bash(gh repo view miquelferrerllompart/trello-link-holded-power-up --json name,url --jq '.url')",
+      "Bash(gh api repos/miquelferrerllompart/trello-link-holded-power-up/pages -X POST -f \"build_type=workflow\")",
+      "Bash(git commit -m \"Add GitHub Pages deploy workflow and configure base path:*)",
+      "Bash(git push)"
     ]
   }
 }
