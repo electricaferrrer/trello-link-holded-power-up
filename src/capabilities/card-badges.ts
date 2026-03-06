@@ -11,7 +11,7 @@ export async function getCardBadges(t: unknown) {
     badges.push({
       text: data.contactName,
       icon: CONTACT_ICON_URL,
-      color: null,
+      color: 'blue',
     });
   }
 
@@ -19,7 +19,7 @@ export async function getCardBadges(t: unknown) {
     badges.push({
       text: data.projectName,
       icon: PROJECT_ICON_URL,
-      color: null,
+      color: 'green',
     });
   }
 
