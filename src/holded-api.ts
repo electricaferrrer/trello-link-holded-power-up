@@ -1,10 +1,9 @@
 import type { HoldedContact, HoldedProject } from './types';
 
-// Cloudflare Worker proxy — update this after deploying the worker
-const PROXY_URL = 'https://holded-proxy.mferrer.workers.dev/api/invoicing/v1';
+const PROXY_BASE = 'https://holded-proxy.mferrer.workers.dev';
 
-async function fetchHolded<T>(apiKey: string, path: string): Promise<T> {
-  const response = await fetch(`${PROXY_URL}${path}`, {
+async function fetchHolded<T>(apiKey: string, url: string): Promise<T> {
+  const response = await fetch(url, {
     headers: { 'X-Holded-Key': apiKey },
   });
   if (!response.ok) {
@@ -14,7 +13,7 @@ async function fetchHolded<T>(apiKey: string, path: string): Promise<T> {
 }
 
 export async function searchContacts(apiKey: string, query: string): Promise<HoldedContact[]> {
-  const contacts = await fetchHolded<HoldedContact[]>(apiKey, '/contacts');
+  const contacts = await fetchHolded<HoldedContact[]>(apiKey, `${PROXY_BASE}/api/invoicing/v1/contacts`);
   if (!query) return contacts;
   const q = query.toLowerCase();
   return contacts.filter(
@@ -26,5 +25,5 @@ export async function searchContacts(apiKey: string, query: string): Promise<Hol
 }
 
 export async function getProjects(apiKey: string): Promise<HoldedProject[]> {
-  return fetchHolded<HoldedProject[]>(apiKey, '/projects');
+  return fetchHolded<HoldedProject[]>(apiKey, `${PROXY_BASE}/api/projects/v1/projects`);
 }
