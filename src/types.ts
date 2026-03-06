@@ -2,6 +2,9 @@ export interface HoldedContact {
   id: string;
   name: string;
   email?: string;
+  code?: string;
+  tradeName?: string;
+  isperson?: boolean;
   vatnumber?: string;
 }
 

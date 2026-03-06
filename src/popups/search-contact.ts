@@ -29,6 +29,8 @@ function filterContacts(contacts: HoldedContact[], query: string): HoldedContact
     (c) =>
       c.name.toLowerCase().includes(q) ||
       (c.email && c.email.toLowerCase().includes(q)) ||
+      (c.code && c.code.toLowerCase().includes(q)) ||
+      (c.tradeName && c.tradeName.toLowerCase().includes(q)) ||
       (c.vatnumber && c.vatnumber.toLowerCase().includes(q))
   );
 }
@@ -47,7 +49,7 @@ function renderResults(contacts: HoldedContact[]) {
       <div class="result-avatar">${initials}</div>
       <div class="result-info">
         <div class="result-name">${c.name}</div>
-        ${c.email || c.vatnumber ? `<div class="result-email">${[c.vatnumber, c.email].filter(Boolean).join(' · ')}</div>` : ''}
+        ${c.code || c.email ? `<div class="result-email">${[c.code, c.email].filter(Boolean).join(' · ')}</div>` : ''}
       </div>
     </div>`;
       }

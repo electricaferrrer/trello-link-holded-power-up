@@ -20,6 +20,8 @@ export async function searchContacts(apiKey: string, query: string): Promise<Hol
     (c) =>
       c.name.toLowerCase().includes(q) ||
       (c.email && c.email.toLowerCase().includes(q)) ||
+      (c.code && c.code.toLowerCase().includes(q)) ||
+      (c.tradeName && c.tradeName.toLowerCase().includes(q)) ||
       (c.vatnumber && c.vatnumber.toLowerCase().includes(q))
   );
 }
