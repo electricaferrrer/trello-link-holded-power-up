@@ -1,6 +1,7 @@
 import type { HoldedContact, HoldedProject, HoldedShippingAddress, CreateContactPayload, CreateContactResponse } from './types';
+import { HOLDED_PROXY_URL } from './config';
 
-const PROXY_BASE = 'https://holded-proxy.mferrer.workers.dev';
+const PROXY_BASE = HOLDED_PROXY_URL;
 
 async function fetchHolded<T>(url: string): Promise<T> {
   const response = await fetch(url);

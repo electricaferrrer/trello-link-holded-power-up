@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
@@ -10,11 +10,12 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: deploy
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  frontend:
+    name: Deploy frontend (GitHub Pages)
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -33,3 +34,16 @@ jobs:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  worker:
+    name: Deploy worker (Cloudflare Workers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: worker

@@ -1,6 +1,7 @@
 import type { TrelloContext } from './types';
+import { TRELLO_APP_KEY } from './config';
 
-const TRELLO_API_KEY = '81d86f6c21c827e54947d36746561233'; // TODO: replace with real key
+const TRELLO_API_KEY = TRELLO_APP_KEY;
 
 async function ensureAuthorized(t: TrelloContext): Promise<string> {
   const restApi = t.getRestApi();
