@@ -3,9 +3,10 @@ import { getCardData, setCardData } from '../storage';
 import { addTag } from '../description-tags';
 import { updateCardDescription } from '../trello-api';
 import { fuzzyFilter } from '../search-utils';
+import { TRELLO_APP_KEY } from '../config';
 import type { HoldedContact, PendingContactSelection, TrelloContext } from '../types';
 
-const t = window.TrelloPowerUp.iframe({ appKey: '81d86f6c21c827e54947d36746561233', appName: 'Holded' }) as unknown as TrelloContext;
+const t = window.TrelloPowerUp.iframe({ appKey: TRELLO_APP_KEY, appName: 'Holded' }) as unknown as TrelloContext;
 const searchInput = document.getElementById('search') as HTMLInputElement;
 const resultsDiv = document.getElementById('results') as HTMLDivElement;
 

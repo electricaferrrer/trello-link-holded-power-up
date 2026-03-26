@@ -2,9 +2,10 @@ import { getCardData, setCardData } from '../storage';
 import { addTag } from '../description-tags';
 import { updateCardDescription } from '../trello-api';
 import { addShippingAddress } from '../holded-api';
+import { TRELLO_APP_KEY } from '../config';
 import type { PendingContactSelection, TrelloContext } from '../types';
 
-const t = window.TrelloPowerUp.iframe({ appKey: '81d86f6c21c827e54947d36746561233', appName: 'Holded' }) as unknown as TrelloContext;
+const t = window.TrelloPowerUp.iframe({ appKey: TRELLO_APP_KEY, appName: 'Holded' }) as unknown as TrelloContext;
 const addressesDiv = document.getElementById('addresses') as HTMLDivElement;
 
 interface AddressOption {

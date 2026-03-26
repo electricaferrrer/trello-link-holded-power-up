@@ -2,9 +2,10 @@ import { createContact } from '../holded-api';
 import { getCardData, setCardData } from '../storage';
 import { addTag } from '../description-tags';
 import { updateCardDescription } from '../trello-api';
+import { TRELLO_APP_KEY } from '../config';
 import type { TrelloContext } from '../types';
 
-const t = window.TrelloPowerUp.iframe({ appKey: '81d86f6c21c827e54947d36746561233', appName: 'Holded' }) as unknown as TrelloContext;
+const t = window.TrelloPowerUp.iframe({ appKey: TRELLO_APP_KEY, appName: 'Holded' }) as unknown as TrelloContext;
 
 const nameInput = document.getElementById('name') as HTMLInputElement;
 const codeInput = document.getElementById('code') as HTMLInputElement;
