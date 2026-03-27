@@ -99,6 +99,10 @@ export interface CreateContactPayload {
     country?: string;
     countryCode?: string;
   };
+  defaults?: {
+    salesTax?: string[];
+    purchasesTax?: string[];
+  };
   /** Creates a note attached to the contact */
   note?: string;
 }
