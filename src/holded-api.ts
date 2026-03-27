@@ -5,13 +5,17 @@ const PROXY_BASE = HOLDED_PROXY_URL;
 
 async function fetchHolded<T>(url: string): Promise<T> {
   const response = await fetch(url);
+  const body = await response.text();
   if (!response.ok) {
-    const body = await response.text();
     let msg = `Holded API error: ${response.status}`;
     try { msg = JSON.parse(body).error || msg; } catch {}
     throw new Error(msg);
   }
-  return response.json();
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new Error(`Respuesta inesperada del servidor (${response.status})`);
+  }
 }
 
 const PAGE_SIZE = 500;
