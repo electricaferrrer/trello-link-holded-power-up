@@ -100,6 +100,10 @@ submitBtn.addEventListener('click', async () => {
         province: provinceInput.value.trim(),
         country: countryInput.value.trim(),
       },
+      defaults: {
+        salesTax: ['s_iva_21'],
+        purchasesTax: ['s_iva_21'],
+      },
       note: `Creado desde Trello por ${member.fullName} — Tablero: ${board.name}`,
     };
     const result = await createContact(payload);
