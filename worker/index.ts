@@ -59,6 +59,18 @@ export default {
       });
     }
 
+    // Validate the response is valid JSON before forwarding
+    if (response.status !== 200) {
+      try {
+        JSON.parse(body);
+      } catch {
+        return new Response(JSON.stringify({ error: `Unexpected Holded API response (${response.status})` }), {
+          status: 502,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     return new Response(body, {
       status: response.status,
       headers: {
