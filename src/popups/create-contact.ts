@@ -1,4 +1,4 @@
-import { createContact } from '../holded-api';
+import { createContact, searchContacts } from '../holded-api';
 import { getCardData, setCardData } from '../storage';
 import { addTag } from '../description-tags';
 import { updateCardDescription } from '../trello-api';
@@ -27,6 +27,52 @@ let isperson: number | null = null;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+\d][\d\s\-().]{5,}$/;
 
+const codeDuplicateMsg = document.getElementById('code-duplicate-msg') as HTMLDivElement;
+let codeDuplicate = false;
+let codeCheckTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearCodeDuplicate() {
+  codeDuplicate = false;
+  codeInput.classList.remove('invalid');
+  codeDuplicateMsg.style.display = 'none';
+}
+
+function checkCodeDuplicate() {
+  const code = codeInput.value.trim();
+  if (code.length < 3) {
+    clearCodeDuplicate();
+    return;
+  }
+  if (codeCheckTimer) clearTimeout(codeCheckTimer);
+  codeCheckTimer = setTimeout(async () => {
+    // Guard against stale response if user kept typing
+    if (codeInput.value.trim() !== code) return;
+    try {
+      const { results } = await searchContacts(code);
+      if (codeInput.value.trim() !== code) return;
+      const normalized = code.toUpperCase().replace(/[\s\-]/g, '');
+      const match = results.find((c) => {
+        const cCode = (c.code || '').toUpperCase().replace(/[\s\-]/g, '');
+        const cVat = (c.vatnumber || '').toUpperCase().replace(/[\s\-]/g, '');
+        return cCode === normalized || cVat === normalized;
+      });
+      codeDuplicate = !!match;
+      codeInput.classList.toggle('invalid', codeDuplicate);
+      if (match) {
+        codeDuplicateMsg.textContent = `Ya existe un contacto con este DNI/CIF: ${match.name}`;
+        codeDuplicateMsg.style.display = 'block';
+      } else {
+        codeDuplicateMsg.style.display = 'none';
+      }
+    } catch {
+      clearCodeDuplicate();
+    }
+    updateSubmitState();
+  }, 400);
+}
+
+codeInput.addEventListener('input', checkCodeDuplicate);
+
 // Type toggle
 typeToggle.querySelectorAll('button').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -52,7 +98,7 @@ function validateForm(): boolean {
   const phone = phoneInput.value.trim();
   const hasContact = email !== '' || phone !== '';
   const contactValid = isValidEmail(email) && isValidPhone(phone);
-  return fieldsOk && hasContact && contactValid && isperson !== null;
+  return fieldsOk && hasContact && contactValid && isperson !== null && !codeDuplicate;
 }
 
 function updateSubmitState() {

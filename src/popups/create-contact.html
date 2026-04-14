@@ -50,6 +50,12 @@
     .required input, .required select { border-color: #091e4240; }
     .required-one input { border-color: #091e4240; }
     input.invalid { border-color: #ae2e24; }
+    .duplicate-msg {
+      font-size: 11px;
+      color: #ae2e24;
+      margin-top: 2px;
+      display: none;
+    }
     .toggle-group {
       display: flex;
       border-radius: 3px;
@@ -130,6 +136,7 @@
       .required input, .required select { border-color: #a6c5e240; }
       .required-one input { border-color: #a6c5e240; }
       input.invalid { border-color: #f87168; }
+      .duplicate-msg { color: #f87168; }
       label { color: #8c9bab; }
       .section-title { color: #8c9bab; border-bottom-color: #a6c5e229; }
       .toggle-group { border-color: #a6c5e229; }
@@ -154,6 +161,7 @@
       <div class="required">
         <label>DNI / CIF *</label>
         <input type="text" id="code" placeholder="12345678A / B12345678" />
+        <div class="duplicate-msg" id="code-duplicate-msg"></div>
       </div>
     </div>
 
